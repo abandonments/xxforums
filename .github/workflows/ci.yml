@@ -1,0 +1,64 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install Frontend Dependencies
+      run: npm install
+
+    - name: Build Frontend
+      run: npm run build
+
+    - name: Install Backend Dependencies
+      run: npm install
+      working-directory: ./backend
+
+    - name: Build Backend
+      run: npm run build
+      working-directory: ./backend
+
+    # - name: Run Backend Tests
+    #   run: npm test
+    #   working-directory: ./backend
+    #   env:
+    #     CI: true
+    #     # You would need to set up your test database and other environment variables here
+    #     # For example, using services: https://docs.github.com/en/actions/using-containerized-services
+    #     PGHOST: localhost
+    #     PGUSER: postgres
+    #     PGPASSWORD: password
+    #     PGDATABASE: test_db
+    #     PGPORT: 5432
+
+    # - name: Deploy Frontend
+    #   uses: actions/deploy-pages@v4 # Example for GitHub Pages
+    #   with:
+    #     # Configure deployment settings
+    #
+    # - name: Deploy Backend
+    #   run: |
+    #     # Add your backend deployment script here
+    #     # e.g., ssh into a server, docker push, etc.
+    #   env:
+    #     # Add production environment variables here, using GitHub Secrets
+    #     FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}

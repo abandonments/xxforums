@@ -1,0 +1,82 @@
+To fix the "invalid chai property: Status" error and ensure your testing environment is completely clean and correctly configured, please follow these steps precisely:
+
+---
+**Commands to Execute in your Terminal**
+---
+
+**Step 1: Clean up your project directories**
+
+*   **Navigate to your project root directory (where package.json is located):**
+    ```bash
+    cd /home/g43rebirth/Downloads/app
+    ```
+*   **Remove all `node_modules` and lock files for a fresh start:**
+    ```bash
+    rm -rf node_modules
+    rm package-lock.json
+    # If you use yarn: rm yarn.lock
+    ```
+*   **Navigate to your `backend` directory:**
+    ```bash
+    cd backend
+    ```
+*   **Remove all `node_modules` and lock files in the backend as well:**
+    ```bash
+    rm -rf node_modules
+    rm package-lock.json
+    # If you use yarn: rm yarn.lock
+    ```
+*   **Go back to the project root:**
+    ```bash
+    cd ..
+    ```
+*   **Clear npm cache globally:**
+    ```bash
+    npm cache clean --force
+    ```
+
+**Step 2: Reinstall all dependencies**
+
+*   **In your project root directory:**
+    ```bash
+    npm install
+    ```
+*   **Navigate to your `backend` directory:**
+    ```bash
+    cd backend
+    ```
+*   **Install backend dependencies:**
+    ```bash
+    npm install
+    ```
+
+**Step 3: Ensure PostgreSQL is running and migrations are applied**
+
+*   **Ensure your PostgreSQL database is running.** If not, you can start it using Docker:
+    ```bash
+    docker run --name some-postgres -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres
+    ```
+*   **Ensure your `backend/.env` file is correctly configured:**
+    ```
+    PGUSER=postgres
+    PGHOST=localhost
+    PGDATABASE=postgres
+    PGPASSWORD=password
+    PGPORT=5432
+    ```
+*   **Apply database migrations:**
+    ```bash
+    cd /home/g43rebirth/Downloads/app/backend
+    npx knex migrate:latest
+    ```
+
+**Step 4: Run the tests**
+
+*   **From your `backend` directory:**
+    ```bash
+    npm test
+    ```
+
+This systematic approach, combined with the updated assertion style in the test files, should eliminate any environment-related issues and ensure the tests are running with the correct Supertest assertion syntax.
+
+Please let me know the exact output after following these steps.

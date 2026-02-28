@@ -1,0 +1,69 @@
+[dotenv@17.3.1] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+Firebase Admin SDK initialized successfully.
+(node:2539) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Backend listening at http://localhost:3000
+
+
+  Forum API
+    1) "before all" hook in "Forum API"
+    2) "after all" hook in "Forum API"
+
+  Moderation API
+    3) "before all" hook in "Moderation API"
+    4) "after all" hook in "Moderation API"
+
+  Reputation API
+    5) "before all" hook in "Reputation API"
+    6) "after all" hook in "Reputation API"
+
+  Users API
+    7) "before all" hook in "Users API"
+    8) "after all" hook in "Users API"
+
+
+  0 passing (141ms)
+  8 failing
+
+  1) Forum API
+       "before all" hook in "Forum API":
+     Error: connect ECONNREFUSED 127.0.0.1:5432
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+
+  2) Forum API
+       "after all" hook in "Forum API":
+     Error: connect ECONNREFUSED 127.0.0.1:5432
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+
+  3) Moderation API
+       "before all" hook in "Moderation API":
+     Error: connect ECONNREFUSED 127.0.0.1:5432
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+
+  4) Moderation API
+       "after all" hook in "Moderation API":
+     Error: connect ECONNREFUSED 127.0.0.1:5432
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+
+  5) Reputation API
+       "before all" hook in "Reputation API":
+     Error: connect ECONNREFUSED 127.0.0.1:5432
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+
+  6) Reputation API
+       "after all" hook in "Reputation API":
+     Error: connect ECONNREFUSED 127.0.0.1:5432
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+
+  7) Users API
+       "before all" hook in "Users API":
+     Error: connect ECONNREFUSED 127.0.0.1:5432
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+
+  8) Users API
+       "after all" hook in "Users API":
+     Error: connect ECONNREFUSED 127.0.0.1:5432
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)
+
+
+

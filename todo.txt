@@ -1,0 +1,50 @@
+**Mission: Enhance Production Readiness and Complete Core Features**
+
+This document outlines the necessary tasks to move the project towards a production-ready state. The focus is on improving test coverage, completing core features, and enhancing security and performance.
+
+---
+
+**1. Comprehensive Backend Testing**
+
+*   **Current State:** The `backend/test` directory contains several test files (`forum.test.ts`, `moderation.test.ts`, `reputation.test.ts`, `users.test.ts`), but they may not be up-to-date with the latest code changes. The `test-setup.js` is in JavaScript, not TypeScript.
+*   **Target State:** A robust and comprehensive test suite for the backend. All existing tests should be reviewed and updated to reflect the current state of the codebase. New tests should be added to cover all API endpoints and business logic. The entire test suite should be in TypeScript.
+*   **Constraints:** Tests should be written using `mocha` and `chai`, which seem to be the established testing frameworks for the backend. `supertest` should be used for API endpoint testing.
+
+---
+
+**2. Frontend Testing Implementation**
+
+*   **Current State:** There is no visible testing infrastructure for the frontend. No `*.test.tsx` files are present in the `components` or `pages` directories.
+*   **Target State:** A comprehensive testing strategy for the frontend. This should include unit tests for individual components, integration tests for features, and end-to-end tests for critical user flows.
+*   **Constraints:** Use `vitest` or `jest` with `react-testing-library` for unit and integration testing. Use `Cypress` or `Playwright` for end-to-end testing.
+
+---
+
+**3. Complete Monero and Escrow Features**
+
+*   **Current State:** The codebase has placeholder files for Monero and Escrow functionality (`moneroController.ts`, `escrowController.ts`, `Upgrade.tsx`, `EscrowDashboard.tsx`). The database schema has been migrated, but the core logic is missing.
+*   **Target State:** A fully functional Monero integration for user upgrades and a secure escrow system for user-to-user transactions. The backend must handle all aspects of the transaction lifecycle, and the frontend must provide a seamless user experience.
+*   **Constraints:** All backend logic must be in TypeScript. The Monero integration must use the Monero Wallet RPC. The frontend must use the existing React component structure.
+
+---
+
+**4. Re-implement Real-time Features**
+
+*   **Current State:** The `Shoutbox.tsx` and `OnlineUsers.tsx` components exist, but the backend implementation for real-time communication is likely incomplete or missing.
+*   **Target State:** A fully functional real-time system for the shoutbox and online user tracking. This will likely involve using WebSockets.
+*   **Constraints:** Use `socket.io` on both the frontend and backend, as it is already a dependency. The implementation should be scalable and handle authentication.
+
+---
+**5. Errors and Issues**
+
+*   **TypeScript Compilation Error in `escrowRoutes.ts`**: The file `backend/src/routes/escrowRoutes.ts` has a TypeScript compilation error: `error TS1005: 'from' expected.`. This is due to incorrect import statements with `.ts` extensions.
+*   **Failing Backend Tests**: The backend test suite is currently failing. The test script in `backend/package.json` has been modified multiple times, and the test setup has been changed. The tests need to be fixed to ensure the backend is stable.
+*   **Incomplete `escrow.ts` library**: The file `backend/src/lib/escrow.ts` appears to be incomplete, as the functions in `escrowController.ts` are calling functions that are not defined in `escrow.ts`.
+*   **`knexfile.cjs`**: The knex configuration file is in `.cjs` format. It should be converted to a `.ts` file to maintain consistency with the rest of the codebase.
+
+---
+**6. Architectural Improvements**
+
+*   **`escrowController.ts` and `escrow.ts` Mismatch**: The `escrowController.ts` is calling functions from `escrow.ts` with incorrect arguments. This needs to be investigated and fixed.
+*   **Refactor Real-time Feature Controllers**: The `shoutboxController.ts` and `socketController.ts` are tightly coupled with the main `index.ts` file and perform direct database access. This should be refactored to use a more modular and layered architecture.
+*   **Non-scalable `onlineUsers` Implementation**: The `socketController.ts` uses an in-memory `Map` to store online users. This will not work in a multi-process or multi-server environment. A distributed cache like Redis should be used instead.
