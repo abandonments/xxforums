@@ -28,6 +28,7 @@ import { sanitizeInput } from './src/middleware/sanitizationMiddleware.js'; // I
 import { uploadImage } from './src/controllers/uploadController.js';
 import logger from './src/lib/logger.js'; // Import shared logger
 import { checkIncomingPayments } from './src/lib/monero.js'; // Import Monero payment checker
+import { MoneroIncomingTransfer } from 'monero-ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -220,23 +221,28 @@ setInterval(async () => {
   try {
     const transfers = await checkIncomingPayments();
     for (const transfer of transfers) {
-      // Find the user associated with the payment
-      const user = await knexInstance('users').where({ monero_integrated_address: transfer.getAddress() }).first();
-      if (user) {
-        // Check if this transaction has already been processed
-        const existingPayment = await knexInstance('monero_payments').where({ tx_hash: transfer.getTxHash() }).first();
-        if (!existingPayment) {
-          // Save the payment record
-          await knexInstance('monero_payments').insert({
-            user_id: user.id,
-            amount: transfer.getAmount(),
-            tx_hash: transfer.getTxHash(),
-            status: 'confirmed',
-          });
-
-          // Update the user's role (example: upgrade to 'VIP' for any payment)
-          await knexInstance('users').where({ id: user.id }).update({ role: 'VIP' });
-          logger.info(`Processed payment for user ${user.username} and upgraded to VIP.`);
+      // We need to check if the transfer is an incoming transfer, as only incoming transfers have a destination address
+      if (transfer.isIncoming()) {
+        const tx = transfer.getTx();
+        if (tx) {
+          const user = await knexInstance('users').where({ monero_integrated_address: transfer.getAddress() }).first();
+          if (user) {
+            const txHash = tx.getHash();
+            // Check if this transaction has already been processed
+            const existingPayment = await knexInstance('monero_payments').where({ tx_hash: txHash }).first();
+            if (!existingPayment) {
+              // Save the payment record
+              await knexInstance('monero_payments').insert({
+                user_id: user.id,
+                amount: transfer.getAmount(),
+                tx_hash: txHash,
+                status: 'confirmed',
+              });
+              // Update the user's role (example: upgrade to 'VIP' for any payment)
+              await knexInstance('users').where({ id: user.id }).update({ role: 'VIP' });
+              logger.info(`Processed payment for user ${user.username} and upgraded to VIP.`);
+            }
+          }
         }
       }
     }
