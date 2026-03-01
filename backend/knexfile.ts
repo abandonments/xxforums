@@ -1,23 +1,19 @@
-require('dotenv').config({ path: __dirname + '/.env' }); // Load backend .env file
-require('ts-node/register'); // Register ts-node for TypeScript migrations
+import 'dotenv/config';
+import type { Knex } from 'knex';
 
-/**
- * @type { Object.<string, import("knex").Knex.Config> }
- */
-module.exports = {
-
+const config: { [key: string]: Knex.Config } = {
   development: {
     client: 'pg',
     connection: {
       host: process.env.PGHOST,
-      port: process.env.PGPORT,
+      port: process.env.PGPORT ? parseInt(process.env.PGPORT) : 5432,
       user: process.env.PGUSER,
       password: process.env.PGPASSWORD,
       database: process.env.PGDATABASE,
     },
     migrations: {
       directory: './migrations',
-      extension: 'ts', // Explicitly tell Knex to look for .ts files
+      extension: 'ts',
     },
     seeds: {
       directory: './seeds',
@@ -28,7 +24,7 @@ module.exports = {
     client: 'pg',
     connection: {
       host: process.env.PGHOST,
-      port: process.env.PGPORT,
+      port: process.env.PGPORT ? parseInt(process.env.PGPORT) : 5432,
       user: process.env.PGUSER,
       password: process.env.PGPASSWORD,
       database: process.env.PGDATABASE,
@@ -51,7 +47,7 @@ module.exports = {
     client: 'pg',
     connection: {
       host: process.env.PGHOST,
-      port: process.env.PGPORT,
+      port: process.env.PGPORT ? parseInt(process.env.PGPORT) : 5432,
       user: process.env.PGUSER,
       password: process.env.PGPASSWORD,
       database: process.env.PGDATABASE,
@@ -69,5 +65,6 @@ module.exports = {
       directory: './seeds',
     },
   }
-
 };
+
+export default config;

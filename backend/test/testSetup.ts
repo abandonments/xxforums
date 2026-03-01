@@ -1,9 +1,9 @@
 import knex from 'knex';
-import knexfile from '../knexfile.cjs';
+import knexConfig from '../knexfile.js';
 import { UserRole } from '../src/types/user.js';
 import { Request, Response, NextFunction } from 'express';
 
-const db = knex(knexfile.development);
+const db = knex(knexConfig.development);
 
 before(async () => {
   console.log('Running global test setup...');

@@ -2,10 +2,8 @@ import 'dotenv/config';
 
 import express, { Response, NextFunction, Request } from 'express';
 import { Pool } from 'pg';
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const knexfile: any = require('../knexfile.cjs');
 import knex from 'knex';
+import knexConfig from './knexfile.js';
 import admin from 'firebase-admin';
 import path from 'path'; // Still needed for serviceAccountPath
 import { fileURLToPath } from 'url';
@@ -44,7 +42,7 @@ const io = new Server(httpServer, { // Initialize Socket.IO
 io.use(socketAuthMiddleware); // Apply Socket.IO authentication middleware
 const port = 3000;
 
-const knexInstance = knex((knexfile as any).development);
+const knexInstance = knex(knexConfig.development);
 
 let firebaseInitialized = false;
 
