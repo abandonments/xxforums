@@ -222,7 +222,7 @@ setInterval(async () => {
     const transfers = await checkIncomingPayments();
     for (const transfer of transfers) {
       // We need to check if the transfer is an incoming transfer, as only incoming transfers have a destination address
-      if (transfer.isIncoming()) {
+      if (transfer.getIsIncoming()) {
         const tx = transfer.getTx();
         if (tx) {
           const user = await knexInstance('users').where({ monero_integrated_address: transfer.getAddress() }).first();
