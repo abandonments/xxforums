@@ -100,13 +100,10 @@ export const useUserActions = () => {
 
 
 
-        } catch (error: any) {
-
--           console.error("Reputation error:", error);
-
--           throw new Error(error.response?.data?.message || 'Failed to update reputation via backend');
-
-        } finally {
+                } catch (error: any) {
+                   console.error("Reputation error:", error);
+                   throw new Error(error.response?.data?.message || 'Failed to update reputation via backend');
+                } finally {
 
             setLoading(false);
 

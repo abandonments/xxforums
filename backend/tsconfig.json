@@ -9,9 +9,10 @@
     "skipLibCheck": true,
     "strict": true,
     "types": ["node", "mocha"],
+    "typeRoots": ["./src/types", "./node_modules/@types"],
     "sourceMap": true,
-    "declaration": false,
-    "declarationMap": false,
+    "declaration": true,
+    "declarationMap": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true
   },

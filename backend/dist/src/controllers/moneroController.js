@@ -1,5 +1,5 @@
-import moneroService from '../lib/monero';
-import logger from '../lib/logger';
+import moneroService from '../lib/monero.js';
+import logger from '../lib/logger.js';
 export const getBalance = async (req, res, next) => {
     try {
         // This is an admin-only function for now, for security.

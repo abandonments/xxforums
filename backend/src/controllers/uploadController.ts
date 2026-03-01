@@ -2,10 +2,8 @@ import { Response, NextFunction, Request } from 'express';
 import axios from 'axios';
 import FormData from 'form-data';
 
-import logger from '../lib/logger.ts'; // Import shared logger
+import logger from '../lib/logger.js';
 
-// IMGBB_API_KEY should always be loaded from environment variables in production.
-// For development, it can be provided via .env
 const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
 
 export const uploadImage = async (req: Request, res: Response, next: NextFunction) => {
@@ -18,10 +16,6 @@ export const uploadImage = async (req: Request, res: Response, next: NextFunctio
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded.' });
     }
-
-    // Authentication is handled by authenticateFirebaseToken middleware
-    // We can directly access req.firebaseUser here if needed, but not explicitly used in upload logic itself
-    // The presence of req.firebaseUser ensures the user is authenticated
 
     const formData = new FormData();
     formData.append('image', req.file.buffer.toString('base64'));
@@ -42,7 +36,6 @@ export const uploadImage = async (req: Request, res: Response, next: NextFunctio
     }
   } catch (error: any) {
     logger.error('Backend image upload error:', error);
-    // Standardize error format passed to next()
     next({ statusCode: error.response?.status || 500, message: error.response?.data?.error?.message || 'Failed to upload image.' });
   }
 };

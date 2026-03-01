@@ -1,11 +1,10 @@
-
 import express from 'express';
-import { getShoutboxMessages, postShoutboxMessage } from '../controllers/shoutboxController.ts';
-import { authMiddleware } from '../middleware/authMiddleware.ts';
+import { getShoutboxMessages, postShoutboxMessage } from '../controllers/shoutboxController.js';
+import { authenticateFirebaseToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/', authMiddleware, getShoutboxMessages);
-router.post('/', authMiddleware, postShoutboxMessage);
+router.get('/', authenticateFirebaseToken, getShoutboxMessages);
+router.post('/', authenticateFirebaseToken, postShoutboxMessage);
 
 export default router;

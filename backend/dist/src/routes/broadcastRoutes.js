@@ -1,8 +1,8 @@
 import express from 'express';
-import { createBroadcast, getBroadcasts } from '../controllers/broadcastController';
-import { authMiddleware } from '../middleware/authMiddleware';
+import { setGlobalBroadcast, clearGlobalBroadcast } from '../controllers/broadcastController.js';
+import { authenticateFirebaseToken } from '../middleware/authMiddleware.js';
 const router = express.Router();
-router.post('/', authMiddleware, createBroadcast);
-router.get('/', authMiddleware, getBroadcasts);
+router.post('/', authenticateFirebaseToken, setGlobalBroadcast);
+router.delete('/', authenticateFirebaseToken, clearGlobalBroadcast);
 export default router;
 //# sourceMappingURL=broadcastRoutes.js.map

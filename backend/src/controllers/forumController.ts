@@ -1,14 +1,9 @@
 import { Response, NextFunction, Request } from 'express';
-import knex from 'knex';
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const knexfile: any = require('../../../knexfile.cjs');
-import { validationResult } from 'express-validator'; // Keep validationResult
-import { categoryCache } from '../lib/cache.js'; // Import categoryCache
-import { createNotification } from './notificationController.js'; // Import createNotification
+import { knexInstance } from '../../index.js';
+import { validationResult } from 'express-validator';
+import { categoryCache } from '../lib/cache.js';
+import { createNotification } from './notificationController.js';
 
-
-const knexInstance = knex((knexfile as any).development);
 
 // CATEGORY CONTROLLERS
 export const createCategory = async (req: Request, res: Response, next: NextFunction) => {
@@ -18,16 +13,9 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
       return res.status(400).json({ errors: errors.array() });
     }
 
-    // Ensure user is authenticated to create category
-    if (!req.firebaseUser) {
+    if (!req.userId) {
       return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
     }
-
-    // Optional: Add authorization check based on user role if only certain roles can create categories
-    // const currentUser = await knexInstance('users').where({ firebase_uid: req.firebaseUser.uid }).first();
-    // if (!currentUser || !['admin', 'root'].includes(currentUser.role)) {
-    //   return res.status(403).json({ message: 'Forbidden: Insufficient permissions.' });
-    // }
 
     const { name, description } = req.body;
     const [newCategory] = await knexInstance('categories').insert({ name, description }).returning('*');
@@ -76,11 +64,10 @@ export const updateCategory = async (req: Request, res: Response, next: NextFunc
     const { id } = req.params;
     const { name, description } = req.body;
 
-    // Authorization check for updating category
-    if (!req.firebaseUser) {
+    if (!req.userId) {
         return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
     }
-    const currentUser = await knexInstance('users').where({ firebase_uid: req.firebaseUser.uid }).first();
+    const currentUser = await knexInstance('users').where({ firebase_uid: req.userId }).first();
     if (!currentUser || !['admin', 'root'].includes(currentUser.role)) {
         return res.status(403).json({ message: 'Forbidden: Only admin or root can update categories.' });
     }
@@ -102,11 +89,10 @@ export const deleteCategory = async (req: Request, res: Response, next: NextFunc
   try {
     const { id } = req.params;
 
-    // Authorization check for deleting category
-    if (!req.firebaseUser) {
+    if (!req.userId) {
         return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
     }
-    const currentUser = await knexInstance('users').where({ firebase_uid: req.firebaseUser.uid }).first();
+    const currentUser = await knexInstance('users').where({ firebase_uid: req.userId }).first();
     if (!currentUser || !['admin', 'root'].includes(currentUser.role)) {
         return res.status(403).json({ message: 'Forbidden: Only admin or root can delete categories.' });
     }
@@ -130,11 +116,11 @@ export const createThread = async (req: Request, res: Response, next: NextFuncti
     }
 
     const { category_id, title, content } = req.body;
-    if (!req.firebaseUser) {
+    if (!req.userId) {
       return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
     }
 
-    const user = await knexInstance('users').where({ firebase_uid: req.firebaseUser.uid }).first();
+    const user = await knexInstance('users').where({ firebase_uid: req.userId }).first();
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
     }
@@ -154,8 +140,8 @@ export const createThread = async (req: Request, res: Response, next: NextFuncti
 export const getAllThreads = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { categoryId } = req.query;
-    let queryBuilder = knexInstance('threads') // Renamed to avoid conflict with query function
-      .select('threads.*', 'users.username', 'categories.name as category_name', 'users.firebase_uid', 'users.avatarUrl', 'users.reputation', 'users.role as authorRole') // Added more user fields
+    let queryBuilder = knexInstance('threads')
+      .select('threads.*', 'users.username', 'categories.name as category_name', 'users.firebase_uid', 'users.avatarUrl', 'users.reputation', 'users.role as authorRole')
       .join('users', 'threads.user_id', '=', 'users.id')
       .join('categories', 'threads.category_id', '=', 'categories.id');
 
@@ -174,7 +160,7 @@ export const getThreadById = async (req: Request, res: Response, next: NextFunct
   try {
     const { id } = req.params;
     const thread = await knexInstance('threads')
-      .select('threads.*', 'users.username', 'categories.name as category_name', 'users.firebase_uid', 'users.avatarUrl', 'users.reputation', 'users.role as authorRole') // Added more user fields
+      .select('threads.*', 'users.username', 'categories.name as category_name', 'users.firebase_uid', 'users.avatarUrl', 'users.reputation', 'users.role as authorRole')
       .join('users', 'threads.user_id', '=', 'users.id')
       .join('categories', 'threads.category_id', '=', 'categories.id')
       .where('threads.id', id)
@@ -198,7 +184,7 @@ export const updateThread = async (req: Request, res: Response, next: NextFuncti
 
     const { id } = req.params;
     const { title, content, category_id } = req.body;
-    if (!req.firebaseUser) {
+    if (!req.userId) {
       return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
     }
 
@@ -207,8 +193,8 @@ export const updateThread = async (req: Request, res: Response, next: NextFuncti
       return res.status(404).json({ message: `Thread with ID ${id} not found.` });
     }
 
-    const user = await knexInstance('users').where({ firebase_uid: req.firebaseUser.uid }).first();
-    if (!user || (user.id !== thread.user_id && user.role !== 'admin' && user.role !== 'root')) { // Changed 'moderator' to 'root' for broader admin control
+    const user = await knexInstance('users').where({ firebase_uid: req.userId }).first();
+    if (!user || (user.id !== thread.user_id && user.role !== 'admin' && user.role !== 'root')) {
       return res.status(403).json({ message: 'Forbidden: You do not have permission to update this thread.' });
     }
 
@@ -226,7 +212,7 @@ export const updateThread = async (req: Request, res: Response, next: NextFuncti
 export const deleteThread = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    if (!req.firebaseUser) {
+    if (!req.userId) {
       return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
     }
 
@@ -235,14 +221,13 @@ export const deleteThread = async (req: Request, res: Response, next: NextFuncti
       return res.status(404).json({ message: `Thread with ID ${id} not found.` });
     }
 
-    const user = await knexInstance('users').where({ firebase_uid: req.firebaseUser.uid }).first();
-    if (!user || (user.id !== thread.user_id && user.role !== 'admin' && user.role !== 'root')) { // Changed 'moderator' to 'root' for broader admin control
+    const user = await knexInstance('users').where({ firebase_uid: req.userId }).first();
+    if (!user || (user.id !== thread.user_id && user.role !== 'admin' && user.role !== 'root')) {
       return res.status(403).json({ message: 'Forbidden: You do not have permission to delete this thread.' });
     }
 
     const deletedCount = await knexInstance('threads').where({ id }).del();
     if (deletedCount === 0) {
-      // This case should theoretically not be hit if thread was found above
       return res.status(404).json({ message: `Thread with ID ${id} not found during deletion.` });
     }
     res.status(204).send();
@@ -262,11 +247,11 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
     const { threadId } = req.params;
     const { content } = req.body;
 
-    if (!req.firebaseUser) {
+    if (!req.userId) {
       return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
     }
 
-    const user = await knexInstance('users').where({ firebase_uid: req.firebaseUser.uid }).first();
+    const user = await knexInstance('users').where({ firebase_uid: req.userId }).first();
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
     }
@@ -283,9 +268,8 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
       .insert({ thread_id: threadId, user_id: user.id, content })
       .returning('*');
 
-    // Notify the thread author
     if (thread.user_id !== user.id) {
-      createNotification(
+      await createNotification(
         thread.user_id,
         'new_reply',
         `${user.username} replied to your thread "${thread.title}"`
@@ -300,7 +284,7 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
 
 export const getPostsByThreadId = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const errors = validationResult(req); // This validation check here for GET is unusual unless query params are validated
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
@@ -312,20 +296,14 @@ export const getPostsByThreadId = async (req: Request, res: Response, next: Next
         'posts.*',
         'users.username',
         'users.firebase_uid',
-        'users.avatarUrl', // Changed to avatarUrl for consistency
+        'users.avatarUrl',
         'users.signature',
         'users.reputation',
-        'users.role as authorRole' // Added authorRole
+        'users.role as authorRole'
       )
       .join('users', 'posts.user_id', '=', 'users.id')
       .where('posts.thread_id', threadId)
       .orderBy('posts.created_at', 'asc');
-
-    if (posts.length === 0) {
-      // It's acceptable for a thread to have no posts other than the OP, so 404 might be too strong
-      // If thread exists but no replies, it's not a 404 for the thread itself.
-      // return res.status(404).json({ message: 'No posts found for this thread.' });
-    }
 
     res.status(200).json(posts);
   } catch (error) {
@@ -335,7 +313,7 @@ export const getPostsByThreadId = async (req: Request, res: Response, next: Next
 
 export const getPostById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const errors = validationResult(req); // This validation check here for GET is unusual unless query params are validated
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
@@ -347,10 +325,10 @@ export const getPostById = async (req: Request, res: Response, next: NextFunctio
         'posts.*',
         'users.username',
         'users.firebase_uid',
-        'users.avatarUrl', // Changed to avatarUrl for consistency
+        'users.avatarUrl',
         'users.signature',
         'users.reputation',
-        'users.role as authorRole' // Added authorRole
+        'users.role as authorRole'
       )
       .join('users', 'posts.user_id', '=', 'users.id')
       .where('posts.id', id)
@@ -376,7 +354,7 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
     const { id } = req.params;
     const { content } = req.body;
 
-    if (!req.firebaseUser) {
+    if (!req.userId) {
       return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
     }
 
@@ -385,8 +363,8 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
       return res.status(404).json({ message: `Post with ID ${id} not found.` });
     }
 
-    const user = await knexInstance('users').where({ firebase_uid: req.firebaseUser.uid }).first();
-    if (!user || (user.id !== post.user_id && user.role !== 'admin' && user.role !== 'root')) { // Changed 'moderator' to 'root' for broader admin control
+    const user = await knexInstance('users').where({ firebase_uid: req.userId }).first();
+    if (!user || (user.id !== post.user_id && user.role !== 'admin' && user.role !== 'root')) {
       return res.status(403).json({ message: 'Forbidden: You do not have permission to update this post.' });
     }
     if (user.is_banned) {
@@ -406,14 +384,14 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
 
 export const deletePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const errors = validationResult(req); // This validation check here for DELETE is unusual unless query params are validated
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
     const { id } = req.params;
 
-    if (!req.firebaseUser) {
+    if (!req.userId) {
       return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
     }
 
@@ -422,8 +400,8 @@ export const deletePost = async (req: Request, res: Response, next: NextFunction
       return res.status(404).json({ message: `Post with ID ${id} not found.` });
     }
 
-    const user = await knexInstance('users').where({ firebase_uid: req.firebaseUser.uid }).first();
-    if (!user || (user.id !== post.user_id && user.role !== 'admin' && user.role !== 'root')) { // Changed 'moderator' to 'root' for broader admin control
+    const user = await knexInstance('users').where({ firebase_uid: req.userId }).first();
+    if (!user || (user.id !== post.user_id && user.role !== 'admin' && user.role !== 'root')) {
       return res.status(403).json({ message: 'Forbidden: You do not have permission to delete this post.' });
     }
     if (user.is_banned) {
@@ -433,7 +411,6 @@ export const deletePost = async (req: Request, res: Response, next: NextFunction
 
     const deletedCount = await knexInstance('posts').where({ id }).del();
     if (deletedCount === 0) {
-      // This case should theoretically not be hit if post was found earlier
       return res.status(404).json({ message: `Post with ID ${id} not found during deletion.` });
     }
 

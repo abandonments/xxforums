@@ -1,20 +1,21 @@
 import { Request, Response } from 'express';
-import { io } from '../../index';
-import knex from '../../knexfile.cjs';
+import { io, knexInstance as db } from '../../index.js';
 
-const db = knex;
+export async function createNotification(userId: number, type: string, message: string) {
+    const [notification] = await db('notifications').insert({
+        user_id: userId,
+        type,
+        message,
+    }).returning('*');
 
-export const createNotification = async (req: Request, res: Response) => {
+    io.to(userId.toString()).emit('newNotification', notification);
+}
+
+export const createNotificationHandler = async (req: Request, res: Response) => {
     try {
         const { userId, type, message } = req.body;
-        const [notification] = await db('notifications').insert({
-            user_id: userId,
-            type,
-            message,
-        }).returning('*');
-
-        io.to(userId).emit('newNotification', notification);
-        res.status(201).json(notification);
+        await createNotification(userId, type, message);
+        res.status(201).json({ message: "Notification created" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to create notification' });

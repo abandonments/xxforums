@@ -1,5 +1,5 @@
-import { knexInstance } from '../../index';
-import logger from '../lib/logger';
+import { knexInstance } from '../../index.js';
+import logger from '../lib/logger.js';
 const onlineUsers = new Map();
 const broadcastOnlineUsers = (io) => {
     io.emit('onlineUsers', Array.from(onlineUsers.values()));
@@ -11,7 +11,7 @@ export const handleSocketConnection = (io) => {
         if (socket.userId) {
             try {
                 const user = await knexInstance('users')
-                    .select('id', 'username', 'avatar', 'role')
+                    .select('id', 'username', 'avatarUrl as avatar', 'role')
                     .where({ id: socket.userId })
                     .first();
                 if (user) {

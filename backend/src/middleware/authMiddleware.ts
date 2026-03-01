@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import admin from 'firebase-admin';
+import admin, { auth } from 'firebase-admin';
 import logger from '../lib/logger.js';
-import { Socket } from 'socket.io'; // Import Socket type
+import { Socket } from 'socket.io';
 
 // Utility function to verify Firebase ID token
-export const verifyFirebaseIdToken = async (idToken: string) => {
+export const verifyFirebaseIdToken = async (idToken: string): Promise<auth.DecodedIdToken> => {
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     return decodedToken;
@@ -21,6 +21,9 @@ export const authenticateFirebaseToken = async (req: Request, res: Response, nex
   }
 
   const idToken = authHeader.split('Bearer ')[1];
+  if (!idToken) {
+    return res.status(401).json({ message: 'No Firebase ID token provided.' });
+  }
 
   try {
     const decodedToken = await verifyFirebaseIdToken(idToken);
@@ -41,7 +44,7 @@ export const socketAuthMiddleware = async (socket: Socket, next: (err?: Error) =
 
   try {
     const decodedToken = await verifyFirebaseIdToken(token);
-    (socket as any).userId = decodedToken.uid; // Attach userId to the socket object
+    socket.userId = decodedToken.uid; // Attach userId to the socket object
     next();
   } catch (error: any) {
     logger.error('Socket.IO authentication error:', error);

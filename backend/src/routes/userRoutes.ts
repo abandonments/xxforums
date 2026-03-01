@@ -3,18 +3,13 @@ import { body, param } from 'express-validator';
 import * as userController from '../controllers/userController.js';
 import { authenticateFirebaseToken } from '../middleware/authMiddleware.js';
 import { sanitizeInput } from '../middleware/sanitizationMiddleware.js';
-import { mockAuthenticateFirebaseToken } from '../../test/testSetup.js';
 
 const router = Router();
-
-const activeAuthenticateFirebaseToken = process.env.NODE_ENV === 'test' 
-  ? mockAuthenticateFirebaseToken 
-  : authenticateFirebaseToken;
 
 // Initiate user profile (create if not exists, retrieve if exists)
 router.post(
     '/initiate-profile',
-    activeAuthenticateFirebaseToken,
+    authenticateFirebaseToken,
     sanitizeInput, // Apply sanitization before validation
     [
         body('firebase_uid').isString().notEmpty().withMessage('Firebase UID is required'),
@@ -30,7 +25,7 @@ router.get('/:firebase_uid', userController.getUserProfile);
 // Update user profile
 router.put(
     '/:firebase_uid/profile',
-    activeAuthenticateFirebaseToken,
+    authenticateFirebaseToken,
     sanitizeInput, // Apply sanitization to all update fields
     [
         body('bio').optional().isString().trim(),
@@ -50,7 +45,7 @@ router.get('/:firebase_uid/comments', userController.getProfileComments);
 // Post a profile comment
 router.post(
     '/:firebase_uid/comments',
-    activeAuthenticateFirebaseToken,
+    authenticateFirebaseToken,
     sanitizeInput, // Apply sanitization before validation
     [
         body('content').isString().trim().notEmpty().withMessage('Comment content cannot be empty'),
@@ -61,21 +56,21 @@ router.post(
 // Delete a profile comment
 router.delete(
     '/:firebase_uid/comments/:commentId',
-    activeAuthenticateFirebaseToken,
+    authenticateFirebaseToken,
     userController.deleteProfileComment
 );
 
 // Vouch for a user
 router.post(
     '/:firebase_uid/vouch',
-    activeAuthenticateFirebaseToken,
+    authenticateFirebaseToken,
     userController.vouchUser
 );
 
 // Delete a user (Admin/Root only)
 router.delete(
     '/:firebase_uid',
-    activeAuthenticateFirebaseToken,
+    authenticateFirebaseToken,
     userController.deleteUser
 );
 

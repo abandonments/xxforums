@@ -1,7 +1,7 @@
 // backend/src/controllers/moneroController.ts
 import { Response, NextFunction, Request } from 'express';
-import moneroService from '../lib/monero';
-import logger from '../lib/logger';
+import moneroService from '../lib/monero.js';
+import logger from '../lib/logger.js';
 
 export const getBalance = async (req: Request, res: Response, next: NextFunction) => {
   try {

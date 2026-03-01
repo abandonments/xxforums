@@ -1,15 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import knex from 'knex';
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const knexfile: any = require('../../../knexfile.cjs');
+import { knexInstance } from '../../index.js';
 import { validationResult } from 'express-validator';
 
-import logger from '../lib/logger.ts';
+import logger from '../lib/logger.js';
 
-const knexInstance = knex((knexfile as any).development);
-
-import { UserProfile } from '../types/user.ts';
+import { UserProfile } from '../types/user.js';
 
 const userProfileSelect = [
     'id', 'firebase_uid', 'email', 'username', 'reputation', 'role',
@@ -31,7 +26,7 @@ export const initiateProfile = async (req: Request, res: Response, next: NextFun
             return res.status(400).json({ errors: errors.array() });
         }
 
-        if (!req.firebaseUser || req.firebaseUser.uid !== req.body.firebase_uid) {
+        if (!req.userId || req.userId !== req.body.firebase_uid) {
             return res.status(403).json({ message: 'Unauthorized: Firebase UID mismatch.' });
         }
 
@@ -101,8 +96,8 @@ export const updateUserProfile = async (req: Request, res: Response, next: NextF
         const { firebase_uid } = req.params;
         const updates = req.body;
 
-        if (!req.firebaseUser || req.firebaseUser.uid !== firebase_uid) {
-            const currentUser = await knexInstance('users').where({ firebase_uid: req.firebaseUser?.uid }).first();
+        if (!req.userId || req.userId !== firebase_uid) {
+            const currentUser = await knexInstance('users').where({ firebase_uid: req.userId }).first();
             if (!currentUser || !['root', 'admin'].includes(currentUser.role)) {
                 return res.status(403).json({ message: 'Forbidden: You can only update your own profile or must be an admin/root.' });
             }
@@ -168,10 +163,10 @@ export const postProfileComment = async (req: Request, res: Response, next: Next
         }
         const { content } = req.body;
 
-        if (!req.firebaseUser) {
+        if (!req.userId) {
             return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
         }
-        const firebaseUserUid = req.firebaseUser.uid;
+        const firebaseUserUid = req.userId;
         if (!firebaseUserUid || Array.isArray(firebaseUserUid)) {
             return res.status(400).json({ message: 'Invalid authenticated user ID format.' });
         }
@@ -183,7 +178,7 @@ export const postProfileComment = async (req: Request, res: Response, next: Next
             return res.status(404).json({ message: `User profile with UID ${firebase_uid} not found.` });
         }
         if (!commenterId) {
-            return res.status(404).json({ message: `Commenter user with UID ${req.firebaseUser.uid} not found.` });
+            return res.status(404).json({ message: `Commenter user with UID ${req.userId} not found.` });
         }
 
         const commenterProfile = await knexInstance('users').where({ id: commenterId }).select('is_banned').first();
@@ -208,7 +203,7 @@ export const postProfileComment = async (req: Request, res: Response, next: Next
         res.status(201).json({
             id: newComment.id,
             toUserId: firebase_uid,
-            fromUserId: req.firebaseUser.uid,
+            fromUserId: req.userId,
             fromUsername: fromUser.username,
             content: newComment.content,
             createdAt: newComment.created_at,
@@ -227,10 +222,10 @@ export const deleteProfileComment = async (req: Request, res: Response, next: Ne
             return res.status(400).json({ message: 'Invalid user ID format.' });
         }
 
-        if (!req.firebaseUser) {
+        if (!req.userId) {
             return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
         }
-        const firebaseUserUid = req.firebaseUser.uid;
+        const firebaseUserUid = req.userId;
         if (!firebaseUserUid || Array.isArray(firebaseUserUid)) {
             return res.status(400).json({ message: 'Invalid authenticated user ID format.' });
         }
@@ -242,7 +237,7 @@ export const deleteProfileComment = async (req: Request, res: Response, next: Ne
             return res.status(404).json({ message: `User profile with UID ${firebase_uid} not found.` });
         }
         if (!currentUserInternalId) {
-            return res.status(404).json({ message: `Current user with UID ${req.firebaseUser.uid} not found.` });
+            return res.status(404).json({ message: `Current user with UID ${req.userId} not found.` });
         }
 
         const comment = await knexInstance('profile_comments')
@@ -287,7 +282,7 @@ export const vouchUser = async (req: Request, res: Response, next: NextFunction)
         if (!voter_firebase_uid || Array.isArray(voter_firebase_uid)) {
             return res.status(400).json({ message: 'Invalid voter user ID format.' });
         }
-        if (!req.firebaseUser || req.firebaseUser.uid !== voter_firebase_uid) {
+        if (!req.userId || req.userId !== voter_firebase_uid) {
             return res.status(403).json({ message: 'Unauthorized: Voter Firebase UID mismatch.' });
         }
 
@@ -345,11 +340,11 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
             return res.status(400).json({ message: 'Invalid user ID format.' });
         }
 
-        if (!req.firebaseUser) {
+        if (!req.userId) {
             return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
         }
 
-        const currentUser = await knexInstance('users').where({ firebase_uid: req.firebaseUser.uid }).first();
+        const currentUser = await knexInstance('users').where({ firebase_uid: req.userId }).first();
         if (!currentUser || !['root', 'admin'].includes(currentUser.role)) {
             return res.status(403).json({ message: 'Forbidden: Only Root or Admin can delete users.' });
         }

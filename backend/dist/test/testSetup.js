@@ -1,6 +1,8 @@
 import knex from 'knex';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 import knexfile from '../knexfile.cjs';
-import { UserRole } from '../src/types/user';
+import { UserRole } from '../src/types/user.js';
 const db = knex(knexfile.development);
 before(async () => {
     console.log('Running global test setup...');
@@ -51,4 +53,8 @@ after(async () => {
     }
     console.log('Global test teardown complete.');
 });
+export const mockAuthenticateFirebaseToken = (req, res, next) => {
+    req.userId = 'test_user_uid';
+    next();
+};
 //# sourceMappingURL=testSetup.js.map

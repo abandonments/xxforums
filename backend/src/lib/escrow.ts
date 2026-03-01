@@ -1,35 +1,40 @@
-
-import { Wallet, RpcConnection } from 'ts-monero';
+import { MoneroWallet, MoneroRpcConnection } from 'monero-ts';
 
 const MONERO_RPC_HOST = process.env.MONERO_RPC_HOST || '127.0.0.1';
 const MONERO_RPC_PORT = process.env.MONERO_RPC_PORT || '18081';
 const MONERO_WALLET_RPC_USER = process.env.MONERO_WALLET_RPC_USER;
 const MONERO_WALLET_RPC_PASSWORD = process.env.MONERO_WALLET_RPC_PASSWORD;
 
-const connection = new RpcConnection(`http://${MONERO_RPC_HOST}:${MONERO_RPC_PORT}/json_rpc`);
-connection.login(MONERO_WALLET_RPC_USER, MONERO_WALLET_RPC_PASSWORD);
+const connection = new MoneroRpcConnection(`http://${MONERO_RPC_HOST}:${MONERO_RPC_PORT}/json_rpc`);
+if(MONERO_WALLET_RPC_USER || MONERO_WALLET_RPC_PASSWORD) {
+    connection.login(MONERO_WALLET_RPC_USER, MONERO_WALLET_RPC_PASSWORD);
+}
 
 export const createEscrowWallet = async (name: string, language: string) => {
-    const wallet = await Wallet.createWallet(connection, name, language);
-    return wallet;
+    // This is not a method on Wallet, this needs to be done via the wallet rpc
+    // const wallet = await Wallet.createWallet(connection, name, language);
+    // return wallet;
+    throw new Error("Not implemented");
 };
 
 export const getEscrowWallet = async (name: string) => {
-    const wallet = await Wallet.openWallet(connection, name);
-    return wallet;
+    // This is not a method on Wallet, this needs to be done via the wallet rpc
+    // const wallet = await Wallet.openWallet(connection, name);
+    // return wallet;
+    throw new Error("Not implemented");
 };
 
-export const getEscrowBalance = async (wallet: Wallet) => {
+export const getEscrowBalance = async (wallet: MoneroWallet) => {
     const balance = await wallet.getBalance();
     return balance;
 };
 
-export const getEscrowAddress = async (wallet: Wallet) => {
+export const getEscrowAddress = async (wallet: MoneroWallet) => {
     const address = await wallet.getAddress();
     return address;
 };
 
-export const releaseEscrow = async (wallet: Wallet, destination: string) => {
+export const releaseEscrow = async (wallet: MoneroWallet, destination: string) => {
     const balance = await wallet.getBalance();
     const transaction = await wallet.createTransaction({
         address: destination,

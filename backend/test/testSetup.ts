@@ -1,6 +1,7 @@
 import knex from 'knex';
 import knexfile from '../knexfile.cjs';
-import { UserRole } from '../src/types/user';
+import { UserRole } from '../src/types/user.js';
+import { Request, Response, NextFunction } from 'express';
 
 const db = knex(knexfile.development);
 
@@ -58,3 +59,8 @@ after(async () => {
   }
   console.log('Global test teardown complete.');
 });
+
+export const mockAuthenticateFirebaseToken = (req: Request, res: Response, next: NextFunction) => {
+    req.userId = 'test_user_uid';
+    next();
+};

@@ -1,13 +1,11 @@
 import knex from 'knex';
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const knexfile = require('../../knexfile.cjs');
+import knexfile from '../../knexfile.cjs';
 import sinon from 'sinon';
 import * as authMiddleware from '../src/middleware/authMiddleware.js';
 import { mockAuthenticateFirebaseToken } from './testSetup.js';
 import { UserProfile } from '../src/types/user.js';
 
-export const knexInstance = knex(knexfile.development as any);
+export const knexInstance = knex(knexfile.development);
 
 export async function clearDatabase() {
     await knexInstance('user_warnings').del();

@@ -1,15 +1,6 @@
-import knex from 'knex';
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const knexfile = require('../../../knexfile.cjs');
+import { knexInstance } from '../../index.js';
 import { validationResult } from 'express-validator';
-import logger from '../lib/logger.ts';
-const knexInstance = knex(knexfile.development);
-// Helper to get user's internal DB ID from firebase_uid
-const getInternalUserId = async (firebase_uid) => {
-    const user = await knexInstance('users').where({ firebase_uid }).select('id').first();
-    return user ? user.id : null;
-};
+import logger from '../lib/logger.js';
 // POST /api/reputation/vote
 export const reputationVote = async (req, res, next) => {
     try {
@@ -18,7 +9,7 @@ export const reputationVote = async (req, res, next) => {
             return res.status(400).json({ errors: errors.array() });
         }
         const { voter_firebase_uid, target_user_firebase_uid, postId, postType, delta } = req.body;
-        if (!req.firebaseUser || req.firebaseUser.uid !== voter_firebase_uid) {
+        if (!req.userId || req.userId !== voter_firebase_uid) {
             return res.status(403).json({ message: 'Unauthorized: Voter Firebase UID mismatch.' });
         }
         const voterUser = await knexInstance('users').where({ firebase_uid: voter_firebase_uid }).first();
@@ -70,7 +61,7 @@ export const warnUser = async (req, res, next) => {
         const WARNING_THRESHOLD = 3;
         const BAN_DURATION_HOURS = 24;
         const MODERATOR_ROLES = ['moderator', 'admin', 'root']; // Define allowed moderator roles
-        if (!req.firebaseUser || req.firebaseUser.uid !== moderator_firebase_uid) {
+        if (!req.userId || req.userId !== moderator_firebase_uid) {
             return res.status(403).json({ message: 'Unauthorized: Moderator Firebase UID mismatch.' });
         }
         const targetUser = await knexInstance('users').where({ firebase_uid: target_user_firebase_uid }).first();

@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import express, { Response, NextFunction } from 'express';
+import express, { Response, NextFunction, Request } from 'express';
 import { Pool } from 'pg';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
@@ -13,21 +13,21 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import multer from 'multer';
 import { createServer } from 'http'; // Add this import
-import { Server, Socket } from 'socket.io'; // Add this import
+import { Server } from 'socket.io'; // Add this import
 
-import forumRoutes from './src/routes/forumRoutes.ts';
-import userRoutes from './src/routes/userRoutes.ts';
-import moderationRoutes from './src/routes/moderationRoutes.ts';
-import moneroRoutes from './src/routes/moneroRoutes.ts';
-import broadcastRoutes from './src/routes/broadcastRoutes.ts';
-import shoutboxRoutes from './src/routes/shoutboxRoutes.ts';
-import escrowRoutes from './src/routes/escrowRoutes.ts';
-import notificationRoutes from './src/routes/notificationRoutes.ts';
-import { authenticateFirebaseToken, socketAuthMiddleware } from './src/middleware/authMiddleware.ts'; // Import socketAuthMiddleware
-import { sanitizeInput } from './src/middleware/sanitizationMiddleware.ts'; // Import sanitizeInput
-import { uploadImage } from './src/controllers/uploadController.ts';
-import logger from './src/lib/logger.ts'; // Import shared logger
-import { checkIncomingPayments } from './src/lib/monero.ts'; // Import Monero payment checker
+import forumRoutes from './src/routes/forumRoutes.js';
+import userRoutes from './src/routes/userRoutes.js';
+import moderationRoutes from './src/routes/moderationRoutes.js';
+import moneroRoutes from './src/routes/moneroRoutes.js';
+import broadcastRoutes from './src/routes/broadcastRoutes.js';
+import shoutboxRoutes from './src/routes/shoutboxRoutes.js';
+import escrowRoutes from './src/routes/escrowRoutes.js';
+import notificationRoutes from './src/routes/notificationRoutes.js';
+import { authenticateFirebaseToken, socketAuthMiddleware } from './src/middleware/authMiddleware.js'; // Import socketAuthMiddleware
+import { sanitizeInput } from './src/middleware/sanitizationMiddleware.js'; // Import sanitizeInput
+import { uploadImage } from './src/controllers/uploadController.js';
+import logger from './src/lib/logger.js'; // Import shared logger
+import { checkIncomingPayments } from './src/lib/monero.js'; // Import Monero payment checker
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -116,17 +116,18 @@ declare global {
   namespace Express {
     interface Request {
       file?: Multer.File;
+      userId?: string;
     }
   }
 }
 
 
-app.get('/', (req: express.Request, res: Response) => {
+app.get('/', (req: Request, res: Response) => {
   res.send('Hello from the Node.js/Express backend!');
 });
 
 
-app.get('/db-test', async (req: express.Request, res: Response, next: NextFunction) => {
+app.get('/db-test', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const client = await pool.connect();
     const result = await client.query('SELECT NOW()');
@@ -142,7 +143,7 @@ app.get('/db-test', async (req: express.Request, res: Response, next: NextFuncti
   }
 });
 
-app.get('/health', async (req: express.Request, res: Response) => {
+app.get('/health', async (req: Request, res: Response) => {
   try {
     const client = await pool.connect();
     await client.query('SELECT 1');
@@ -185,7 +186,7 @@ app.post(
   uploadImage
 );
 
-app.use((err: any, req: express.Request, res: Response, next: NextFunction) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   const statusCode = err.statusCode || 500;
   const message = err.message || 'An unexpected error occurred.';
@@ -198,7 +199,7 @@ app.use((err: any, req: express.Request, res: Response, next: NextFunction) => {
   }
 });
 
-import { handleSocketConnection } from './src/controllers/socketController.ts';
+import { handleSocketConnection } from './src/controllers/socketController.js';
 
 handleSocketConnection(io);
 

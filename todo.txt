@@ -48,3 +48,6 @@ This document outlines the necessary tasks to move the project towards a product
 *   **`escrowController.ts` and `escrow.ts` Mismatch**: The `escrowController.ts` is calling functions from `escrow.ts` with incorrect arguments. This needs to be investigated and fixed.
 *   **Refactor Real-time Feature Controllers**: The `shoutboxController.ts` and `socketController.ts` are tightly coupled with the main `index.ts` file and perform direct database access. This should be refactored to use a more modular and layered architecture.
 *   **Non-scalable `onlineUsers` Implementation**: The `socketController.ts` uses an in-memory `Map` to store online users. This will not work in a multi-process or multi-server environment. A distributed cache like Redis should be used instead.
+
+
+"ERROR: Vite failed to scan for dependencies. Unexpected 'throw' in hooks/useUserActions.ts at line 107. The error occurs during npm run dev. Fix the syntax or the export/import chain so Vite can bundle the app."

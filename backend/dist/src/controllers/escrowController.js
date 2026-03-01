@@ -1,6 +1,5 @@
-import * as escrow from '../lib/escrow';
-import knex from '../../knexfile.cjs';
-const db = knex;
+import * as escrow from '../lib/escrow.js';
+import { knexInstance as db } from '../../index.js';
 export const createEscrow = async (req, res) => {
     try {
         const { name, language, buyerId, sellerId, postId } = req.body;

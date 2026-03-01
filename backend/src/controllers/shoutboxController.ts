@@ -1,9 +1,5 @@
-
 import { Request, Response } from 'express';
-import { io } from '../../index';
-import knex from '../../knexfile.cjs';
-
-const db = knex;
+import { io, knexInstance as db } from '../../index.js';
 
 export const getShoutboxMessages = async (req: Request, res: Response) => {
   try {

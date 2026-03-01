@@ -1,7 +1,7 @@
 import knex from 'knex';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const knexfile = require('../../knexfile.cjs');
+import knexfile from '../../knexfile.cjs';
 import sinon from 'sinon';
 import * as authMiddleware from '../src/middleware/authMiddleware.js';
 import { mockAuthenticateFirebaseToken } from './testSetup.js';

@@ -1,12 +1,12 @@
 import express from 'express';
-import { createEscrow, getBalance, getAddress, releaseEscrow, getEscrows } from '../controllers/escrowController.ts';
-import { authMiddleware } from  = '../middleware/authMiddleware.ts';
+import { createEscrow, getBalance, getAddress, releaseEscrow, getEscrows, getEscrow } from '../controllers/escrowController';
+import { authenticateFirebaseToken } from '../middleware/authMiddleware';
 const router = express.Router();
-router.get('/', authMiddleware, getEscrows);
-router.post('/', authMiddleware, createEscrow);
-router.get('/:id', authMiddleware, getEscrow);
-router.get('/:name/balance', authMiddleware, getBalance);
-router.get('/:name/address', authMiddleware, getAddress);
-router.post('/release', authMiddleware, releaseEscrow);
+router.get('/', authenticateFirebaseToken, getEscrows);
+router.post('/', authenticateFirebaseToken, createEscrow);
+router.get('/:id', authenticateFirebaseToken, getEscrow);
+router.get('/:name/balance', authenticateFirebaseToken, getBalance);
+router.get('/:name/address', authenticateFirebaseToken, getAddress);
+router.post('/release', authenticateFirebaseToken, releaseEscrow);
 export default router;
 //# sourceMappingURL=escrowRoutes.js.map

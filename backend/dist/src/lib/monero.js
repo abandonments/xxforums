@@ -1,5 +1,5 @@
-import { MoneroWalletRpc, MoneroRpcConnection } from 'ts-monero';
-import logger from './logger';
+import { MoneroWalletRpc, MoneroRpcConnection } from 'monero-ts';
+import logger from './logger.js';
 const { MONERO_RPC_HOST, MONERO_RPC_PORT, MONERO_WALLET_RPC_USER, MONERO_WALLET_RPC_PASSWORD, MONERO_WALLET_FILE, MONERO_WALLET_PASSWORD, } = process.env;
 class MoneroService {
     walletRpc;
@@ -69,7 +69,15 @@ class MoneroService {
         const totalPaid = payments.reduce((acc, payment) => acc + payment.amount, 0);
         return totalPaid >= amount;
     }
+    async checkIncomingPayments() {
+        const wallet = await this.getWallet();
+        const transfers = await wallet.getTransfers({ isIncoming: true });
+        return transfers;
+    }
 }
 const moneroService = new MoneroService();
 export default moneroService;
+export const checkIncomingPayments = async () => {
+    return await moneroService.checkIncomingPayments();
+};
 //# sourceMappingURL=monero.js.map

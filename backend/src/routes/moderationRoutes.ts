@@ -2,18 +2,13 @@ import { Router } from 'express';
 import { body } from 'express-validator';
 import * as moderationController from '../controllers/moderationController.js';
 import { authenticateFirebaseToken } from '../middleware/authMiddleware.js';
-import { mockAuthenticateFirebaseToken } from '../../test/testSetup.js';
 
 const router = Router();
-
-const activeAuthenticateFirebaseToken = process.env.NODE_ENV === 'test' 
-  ? mockAuthenticateFirebaseToken 
-  : authenticateFirebaseToken;
 
 // Reputation vote
 router.post(
   '/reputation/vote',
-  activeAuthenticateFirebaseToken,
+  authenticateFirebaseToken,
   [
     body('voter_firebase_uid').isString().notEmpty().withMessage('Voter Firebase UID is required'),
     body('target_user_firebase_uid').isString().notEmpty().withMessage('Target User Firebase UID is required'),
@@ -27,7 +22,7 @@ router.post(
 // Warn user
 router.post(
   '/warn',
-  activeAuthenticateFirebaseToken,
+  authenticateFirebaseToken,
   [
     body('target_user_firebase_uid').isString().notEmpty().withMessage('Target User Firebase UID is required'),
     body('moderator_firebase_uid').isString().notEmpty().withMessage('Moderator Firebase UID is required'),

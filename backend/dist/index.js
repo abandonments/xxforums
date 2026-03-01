@@ -13,19 +13,19 @@ import rateLimit from 'express-rate-limit';
 import multer from 'multer';
 import { createServer } from 'http'; // Add this import
 import { Server } from 'socket.io'; // Add this import
-import forumRoutes from './src/routes/forumRoutes.ts';
-import userRoutes from './src/routes/userRoutes.ts';
-import moderationRoutes from './src/routes/moderationRoutes.ts';
-import moneroRoutes from './src/routes/moneroRoutes.ts';
-import broadcastRoutes from './src/routes/broadcastRoutes.ts';
-import shoutboxRoutes from './src/routes/shoutboxRoutes.ts';
-import escrowRoutes from './src/routes/escrowRoutes.ts';
-import notificationRoutes from './src/routes/notificationRoutes.ts';
-import { authenticateFirebaseToken, socketAuthMiddleware } from './src/middleware/authMiddleware.ts'; // Import socketAuthMiddleware
-import { sanitizeInput } from './src/middleware/sanitizationMiddleware.ts'; // Import sanitizeInput
-import { uploadImage } from './src/controllers/uploadController.ts';
-import logger from './src/lib/logger.ts'; // Import shared logger
-import { checkIncomingPayments } from './src/lib/monero.ts'; // Import Monero payment checker
+import forumRoutes from './src/routes/forumRoutes.js';
+import userRoutes from './src/routes/userRoutes.js';
+import moderationRoutes from './src/routes/moderationRoutes.js';
+import moneroRoutes from './src/routes/moneroRoutes.js';
+import broadcastRoutes from './src/routes/broadcastRoutes.js';
+import shoutboxRoutes from './src/routes/shoutboxRoutes.js';
+import escrowRoutes from './src/routes/escrowRoutes.js';
+import notificationRoutes from './src/routes/notificationRoutes.js';
+import { authenticateFirebaseToken, socketAuthMiddleware } from './src/middleware/authMiddleware.js'; // Import socketAuthMiddleware
+import { sanitizeInput } from './src/middleware/sanitizationMiddleware.js'; // Import sanitizeInput
+import { uploadImage } from './src/controllers/uploadController.js';
+import logger from './src/lib/logger.js'; // Import shared logger
+import { checkIncomingPayments } from './src/lib/monero.js'; // Import Monero payment checker
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
@@ -157,7 +157,7 @@ app.use((err, req, res, next) => {
         res.status(statusCode).json({ message: message, error: err.message, stack: err.stack });
     }
 });
-import { handleSocketConnection } from './src/controllers/socketController.ts';
+import { handleSocketConnection } from './src/controllers/socketController.js';
 handleSocketConnection(io);
 httpServer.listen(port, () => {
     console.log(`Backend listening at http://localhost:${port}`);

@@ -1,11 +1,11 @@
-import { knexInstance, io } from '../../index.ts'; // This will be changed to .ts
-import logger from '../lib/logger.ts'; // This will be changed to .ts
+import { knexInstance, io } from '../../index.js';
+import logger from '../lib/logger.js';
 export const setGlobalBroadcast = async (req, res, next) => {
     try {
-        if (!req.firebaseUser) {
+        if (!req.userId) {
             return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
         }
-        const user = await knexInstance('users').where({ firebase_uid: req.firebaseUser.uid }).first();
+        const user = await knexInstance('users').where({ firebase_uid: req.userId }).first();
         if (!user || !['admin', 'root'].includes(user.role)) {
             return res.status(403).json({ message: 'Forbidden: Insufficient permissions.' });
         }
@@ -27,10 +27,10 @@ export const setGlobalBroadcast = async (req, res, next) => {
 };
 export const clearGlobalBroadcast = async (req, res, next) => {
     try {
-        if (!req.firebaseUser) {
+        if (!req.userId) {
             return res.status(401).json({ message: 'Unauthorized: User not authenticated.' });
         }
-        const user = await knexInstance('users').where({ firebase_uid: req.firebaseUser.uid }).first();
+        const user = await knexInstance('users').where({ firebase_uid: req.userId }).first();
         if (!user || !['admin', 'root'].includes(user.role)) {
             return res.status(403).json({ message: 'Forbidden: Insufficient permissions.' });
         }
