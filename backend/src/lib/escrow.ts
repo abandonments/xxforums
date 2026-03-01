@@ -13,15 +13,16 @@ const {
  * @param password - The password to encrypt the wallet with.
  * @returns The newly created wallet.
  */
-export const createEscrowWallet = async (password: string): Promise<MoneroWallet> => {
+export const createEscrowWallet = async (path: string, password: string): Promise<MoneroWallet> => {
   try {
     const wallet = await moneroTs.createWalletFull({
+      path: path,
       password: password,
       networkType: 'stagenet', // Use stagenet for testing
       server: {
         uri: `http://${MONERO_RPC_HOST}:${MONERO_RPC_PORT}/json_rpc`,
-        username: MONERO_WALLET_RPC_USER,
-        password: MONERO_WALLET_RPC_PASSWORD,
+        ...(MONERO_WALLET_RPC_USER && { username: MONERO_WALLET_RPC_USER }),
+        ...(MONERO_WALLET_RPC_PASSWORD && { password: MONERO_WALLET_RPC_PASSWORD }),
       },
     });
     return wallet;
