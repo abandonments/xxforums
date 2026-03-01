@@ -42,7 +42,11 @@ const io = new Server(httpServer, { // Initialize Socket.IO
 io.use(socketAuthMiddleware); // Apply Socket.IO authentication middleware
 const port = 3000;
 
-const knexInstance = knex(knexConfig.development);
+const developmentConfig = knexConfig.development;
+if (!developmentConfig) {
+  throw new Error('Development configuration for knex is not defined');
+}
+const knexInstance = knex(developmentConfig);
 
 let firebaseInitialized = false;
 
@@ -220,7 +224,7 @@ setInterval(async () => {
     const transfers = await checkIncomingPayments();
     for (const transfer of transfers) {
       // We need to check if the transfer is an incoming transfer, as only incoming transfers have a destination address
-      if (transfer.getIsIncoming()) {
+      if (transfer instanceof MoneroIncomingTransfer) {
         const tx = transfer.getTx();
         if (tx) {
           const user = await knexInstance('users').where({ monero_integrated_address: transfer.getAddress() }).first();

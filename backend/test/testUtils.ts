@@ -5,7 +5,11 @@ import * as authMiddleware from '../src/middleware/authMiddleware.js';
 import { mockAuthenticateFirebaseToken } from './testSetup.js';
 import { UserProfile } from '../src/types/user.js';
 
-export const knexInstance = knex(knexConfig.development);
+const developmentConfig = knexConfig.development;
+if (!developmentConfig) {
+    throw new Error('Development configuration for knex is not defined');
+}
+export const knexInstance = knex(developmentConfig);
 
 export async function clearDatabase() {
     await knexInstance('user_warnings').del();

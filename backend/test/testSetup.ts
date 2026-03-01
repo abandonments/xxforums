@@ -3,7 +3,11 @@ import knexConfig from '../knexfile.js';
 import { UserRole } from '../src/types/user.js';
 import { Request, Response, NextFunction } from 'express';
 
-const db = knex(knexConfig.development);
+const developmentConfig = knexConfig.development;
+if (!developmentConfig) {
+  throw new Error('Development configuration for knex is not defined');
+}
+const db = knex(developmentConfig);
 
 before(async () => {
   console.log('Running global test setup...');
