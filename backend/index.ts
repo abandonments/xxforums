@@ -164,8 +164,7 @@ app.use('/api/users', userRoutes);
 // Register moderation routes
 app.use('/api/moderation', moderationRoutes);
 
-// Register monero routes
-app.use('/api/monero', moneroRoutes);
+
 
 // Register broadcast routes
 app.use('/api/broadcast', broadcastRoutes);
@@ -173,8 +172,7 @@ app.use('/api/broadcast', broadcastRoutes);
 // Register shoutbox routes
 app.use('/api/shoutbox', shoutboxRoutes);
 
-// Register escrow routes
-app.use('/api/escrow', escrowRoutes);
+
 
 // Register notification routes
 app.use('/api/notifications', notificationRoutes);
@@ -216,42 +214,7 @@ httpServer.listen(port, () => {
 // Register forum routes
 app.use('/api/forum', forumRoutes);
 
-// Start a background process to check for Monero payments
-const paymentCheckInterval = 5 * 60 * 1000; // 5 minutes
-setInterval(async () => {
-  logger.info('Checking for new Monero payments...');
-  try {
-    const transfers = await checkIncomingPayments();
-    for (const transfer of transfers) {
-      // We need to check if the transfer is an incoming transfer, as only incoming transfers have a destination address
-      if (transfer instanceof MoneroIncomingTransfer) {
-        const tx = transfer.getTx();
-        if (tx) {
-          const user = await knexInstance('users').where({ monero_integrated_address: transfer.getAddress() }).first();
-          if (user) {
-            const txHash = tx.getHash();
-            // Check if this transaction has already been processed
-            const existingPayment = await knexInstance('monero_payments').where({ tx_hash: txHash }).first();
-            if (!existingPayment) {
-              // Save the payment record
-              await knexInstance('monero_payments').insert({
-                user_id: user.id,
-                amount: transfer.getAmount(),
-                tx_hash: txHash,
-                status: 'confirmed',
-              });
-              // Update the user's role (example: upgrade to 'VIP' for any payment)
-              await knexInstance('users').where({ id: user.id }).update({ role: 'VIP' });
-              logger.info(`Processed payment for user ${user.username} and upgraded to VIP.`);
-            }
-          }
-        }
-      }
-    }
-  } catch (error) {
-    logger.error('Error checking for Monero payments:', error);
-  }
-}, paymentCheckInterval);
+
 
 process.on('SIGINT', () => {
   pool.end(() => {

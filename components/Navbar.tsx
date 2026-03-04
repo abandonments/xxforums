@@ -76,8 +76,7 @@ export const Navbar = () => {
       {/* Navigation Bar */}
       <div className="bg-panel border-y border-border border-b-accent/30 text-xs font-bold text-textMuted px-4 py-0 flex gap-0 shadow-[0_4px_15px_rgba(103,232,249,0.05)]">
           <Link to="/" className="px-4 py-3 hover:bg-accent/5 hover:text-accent transition-colors border-r border-border">HOME</Link>
-          <Link to="/upgrade" className="px-4 py-3 hover:bg-accent/5 hover:text-accent transition-colors border-r border-border text-accent">UPGRADES</Link>
-          <Link to="/escrow" className="px-4 py-3 hover:bg-accent/5 hover:text-accent transition-colors border-r border-border">ESCROW</Link>
+
           <Link to="/inbox" className="px-4 py-3 hover:bg-accent/5 hover:text-accent transition-colors border-r border-border relative">
               MESSAGES
               {unreadCount > 0 && <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>}
