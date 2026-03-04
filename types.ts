@@ -93,49 +93,13 @@ export interface Report {
   createdAt: any;
 }
 
-export enum EscrowStatus {
-  REQUESTED = 'REQUESTED',
-  DECLINED = 'DECLINED',
-  CREATED = 'CREATED',
-  AWAITING_PAYMENT = 'AWAITING_PAYMENT',
-  PAYMENT_VERIFIED = 'PAYMENT_VERIFIED',
-  DELIVERED = 'DELIVERED',
-  COMPLETED = 'COMPLETED',
-  DISPUTED = 'DISPUTED',
-  CANCELLED = 'CANCELLED'
-}
 
-export enum CryptoChain {
-  BTC = 'Bitcoin',
-  XMR = 'Monero',
-  ETH = 'Ethereum'
-}
 
-export interface EscrowTransaction {
-  id: string;
-  buyerId: string;
-  buyerName: string;
-  sellerId: string;
-  sellerName: string;
-  amount: number;
-  currency: CryptoChain;
-  description: string;
-  status: EscrowStatus;
-  depositAddress?: string;
-  createdAt: any;
-  updatedAt: any;
-  disputeReason?: string;
-}
 
-export interface EscrowMessage {
-  id: string;
-  escrowId: string;
-  senderId: string;
-  senderName: string;
-  content: string;
-  isSystem?: boolean;
-  createdAt: any;
-}
+
+
+
+
 
 export interface Payment {
   id: string;

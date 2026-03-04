@@ -235,7 +235,7 @@ const UpgradeManager = ({ theme }: { theme: any }) => {
 
     return (
         <div>
-            <div className={`${theme.headerBg} ${theme.textHeader} text-sm px-3 py-2 border ${theme.border} mb-4`}>Monero Verifications</div>
+
             <div className={`${theme.panelBg} border ${theme.border} p-0`}>
                 <div className="overflow-x-auto">
                     <table className="w-full text-xs">

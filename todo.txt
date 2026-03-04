@@ -37,15 +37,15 @@ This document outlines the necessary tasks to move the project towards a product
 ---
 **5. Errors and Issues**
 
-*   **TypeScript Compilation Error in `escrowRoutes.ts`**: The file `backend/src/routes/escrowRoutes.ts` has a TypeScript compilation error: `error TS1005: 'from' expected.`. This is due to incorrect import statements with `.ts` extensions.
+
 *   **Failing Backend Tests**: The backend test suite is currently failing. The test script in `backend/package.json` has been modified multiple times, and the test setup has been changed. The tests need to be fixed to ensure the backend is stable.
-*   **Incomplete `escrow.ts` library**: The file `backend/src/lib/escrow.ts` appears to be incomplete, as the functions in `escrowController.ts` are calling functions that are not defined in `escrow.ts`.
+
 *   **`knexfile.cjs`**: The knex configuration file is in `.cjs` format. It should be converted to a `.ts` file to maintain consistency with the rest of the codebase.
 
 ---
 **6. Architectural Improvements**
 
-*   **`escrowController.ts` and `escrow.ts` Mismatch**: The `escrowController.ts` is calling functions from `escrow.ts` with incorrect arguments. This needs to be investigated and fixed.
+
 *   **Refactor Real-time Feature Controllers**: The `shoutboxController.ts` and `socketController.ts` are tightly coupled with the main `index.ts` file and perform direct database access. This should be refactored to use a more modular and layered architecture.
 *   **Non-scalable `onlineUsers` Implementation**: The `socketController.ts` uses an in-memory `Map` to store online users. This will not work in a multi-process or multi-server environment. A distributed cache like Redis should be used instead.
 

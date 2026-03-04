@@ -13,8 +13,7 @@ const Category = lazy(() => import('./pages/Category'));
 const Thread = lazy(() => import('./pages/Thread'));
 const Admin = lazy(() => import('./pages/Admin'));
 const Inbox = lazy(() => import('./pages/Inbox'));
-const EscrowDashboard = lazy(() => import('./pages/EscrowDashboard'));
-const EscrowDetail = lazy(() => import('./pages/EscrowDetail'));
+
 const MemberList = lazy(() => import('./pages/MemberList'));
 const Search = lazy(() => import('./pages/Search'));
 const Calendar = lazy(() => import('./pages/Calendar'));
@@ -138,8 +137,7 @@ const App = () => {
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/modcp" element={<ModQueue />} />
                   <Route path="/inbox" element={<Inbox />} />
-                  <Route path="/escrow" element={<EscrowDashboard />} />
-                  <Route path="/escrow/:id" element={<EscrowDetail />} />
+
                   <Route path="/members" element={<MemberList />} />
                   <Route path="/search" element={<Search />} />
                   <Route path="/calendar" element={<Calendar />} />
