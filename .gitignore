@@ -1,2 +1,4 @@
 .gemini/
 gha-creds-*.json
+node_modules/
+backend/dist/
